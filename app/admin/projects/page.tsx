@@ -40,29 +40,46 @@ export default function AdminProjects() {
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const divisionOptions = useMemo(() => divisions.filter(d => d.country === country), [divisions, country])
-
-  async function load() {
-    const load = useCallback(async () => {
-  const [d, p] = await Promise.all([
-    fetch('/api/admin/divisions').then((r) => r.json()),
-    fetch('/api/admin/projects').then((r) => r.json()),
-  ])
-  setDivisions(d)
-  setProjects(p)
-  if (!divisionId && d.length) {
-    const first = d.find((x: Division) => x.country === country)
-    if (first) setDivisionId(first.id)
-  }
-}, [divisionId, country])
+  const divisionOptions = useMemo(
+    () => divisions.filter((d) => d.country === country),
+    [divisions, country]
+  )
 
   useEffect(() => {
-  load().catch(() => {})
-}, [load])
+    async function load() {
+      const [d, p] = await Promise.all([
+        fetch('/api/admin/divisions').then((r) => r.json()),
+        fetch('/api/admin/projects').then((r) => r.json()),
+      ])
+
+      setDivisions(d)
+      setProjects(p)
+
+      // Set default division when empty
+      if (!divisionId && d.length) {
+        const first = d.find((x: Division) => x.country === country)
+        if (first) setDivisionId(first.id)
+      }
+    }
+
+    load().catch(() => {})
+    // We intentionally run only once on page load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function refresh() {
+    const [d, p] = await Promise.all([
+      fetch('/api/admin/divisions').then((r) => r.json()),
+      fetch('/api/admin/projects').then((r) => r.json()),
+    ])
+    setDivisions(d)
+    setProjects(p)
+  }
 
   async function create() {
     setBusy(true)
     setErr('')
+
     const body = {
       country,
       divisionId,
@@ -72,25 +89,45 @@ export default function AdminProjects() {
       description,
       location: location || null,
       heroUrl: heroUrl || null,
-      tags: tagsCsv.split(',').map(t=>t.trim()).filter(Boolean),
+      tags: tagsCsv.split(',').map((t) => t.trim()).filter(Boolean),
       sortOrder: Number(sortOrder) || 0,
-      isFeatured
+      isFeatured,
     }
-    const res = await fetch('/api/admin/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+
+    const res = await fetch('/api/admin/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
     setBusy(false)
+
     if (!res.ok) {
       setErr(await res.text())
       return
     }
-    setTitle(''); setSlug(''); setSummary(''); setDescription(''); setLocation(''); setHeroUrl(''); setTagsCsv(''); setSortOrder(0); setIsFeatured(false)
-    await load()
+
+    setTitle('')
+    setSlug('')
+    setSummary('')
+    setDescription('')
+    setLocation('')
+    setHeroUrl('')
+    setTagsCsv('')
+    setSortOrder(0)
+    setIsFeatured(false)
+
+    await refresh()
   }
 
   async function del(id: string) {
     if (!confirm('Delete this project?')) return
     const res = await fetch(`/api/admin/projects/${id}`, { method: 'DELETE' })
-    if (!res.ok) { alert(await res.text()); return }
-    await load()
+    if (!res.ok) {
+      alert(await res.text())
+      return
+    }
+    await refresh()
   }
 
   const folder = country === 'INDIA' ? 'idam/india/projects/hero' : 'idam/srilanka/projects/hero'
@@ -106,62 +143,93 @@ export default function AdminProjects() {
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <Label>Country</Label>
-            <Select value={country} onChange={(e)=>setCountry(e.target.value as any)}>
+            <Select value={country} onChange={(e) => setCountry(e.target.value as any)}>
               <option value="INDIA">India</option>
               <option value="SRILANKA">Sri Lanka</option>
             </Select>
           </div>
+
           <div>
             <Label>Division</Label>
-            <Select value={divisionId} onChange={(e)=>setDivisionId(e.target.value)}>
-              {divisionOptions.map(d => (
-                <option key={d.id} value={d.id}>{d.name}</option>
+            <Select value={divisionId} onChange={(e) => setDivisionId(e.target.value)}>
+              {divisionOptions.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
               ))}
             </Select>
           </div>
+
           <div className="md:col-span-2">
             <Label>Title</Label>
-            <TextInput value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="e.g., Aalaya Farm Stay Build" />
+            <TextInput value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Aalaya Farm Stay Build" />
           </div>
+
           <div>
             <Label>Slug</Label>
-            <TextInput value={slug} onChange={(e)=>setSlug(e.target.value)} placeholder="e.g., aalaya-farm-stay" />
+            <TextInput value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g., aalaya-farm-stay" />
           </div>
+
           <div>
             <Label>Location</Label>
-            <TextInput value={location} onChange={(e)=>setLocation(e.target.value)} placeholder="Bangalore / Colombo / ..." />
+            <TextInput value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Bangalore / Colombo / ..." />
           </div>
+
           <div className="md:col-span-2">
             <Label>Summary</Label>
-            <TextInput value={summary} onChange={(e)=>setSummary(e.target.value)} placeholder="One-line premium summary" />
+            <TextInput value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="One-line premium summary" />
           </div>
+
           <div className="md:col-span-2">
             <Label>Description</Label>
-            <TextArea value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="Full description" />
+            <TextArea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Full description" />
           </div>
+
           <div>
             <Label>Tags (comma separated)</Label>
-            <TextInput value={tagsCsv} onChange={(e)=>setTagsCsv(e.target.value)} placeholder="infra, interiors, luxury" />
+            <TextInput value={tagsCsv} onChange={(e) => setTagsCsv(e.target.value)} placeholder="infra, interiors, luxury" />
           </div>
+
           <div>
             <Label>Sort Order</Label>
-            <TextInput type="number" value={String(sortOrder)} onChange={(e)=>setSortOrder(Number(e.target.value))} />
+            <TextInput type="number" value={String(sortOrder)} onChange={(e) => setSortOrder(Number(e.target.value))} />
           </div>
+
           <div className="md:col-span-2">
             <Label>Hero Image (optional)</Label>
             <div className="space-y-3">
-              <CloudinaryUploader folder={folder} onUploaded={(url)=>setHeroUrl(url)} />
-              <TextInput value={heroUrl} onChange={(e)=>setHeroUrl(e.target.value)} placeholder="Or paste image URL" />
+              <CloudinaryUploader folder={folder} onUploaded={(url) => setHeroUrl(url)} />
+              <TextInput value={heroUrl} onChange={(e) => setHeroUrl(e.target.value)} placeholder="Or paste image URL" />
             </div>
-          </div>
-          <div className="md:col-span-2 flex items-center gap-3">
-            <input id="featured" type="checkbox" checked={isFeatured} onChange={(e)=>setIsFeatured(e.target.checked)} />
-            <label htmlFor="featured" className="text-sm text-neutral-700">Featured</label>
           </div>
 
           <div className="md:col-span-2 flex items-center gap-3">
-            <PrimaryButton disabled={busy} onClick={create}>{busy ? 'Saving…' : 'Create Project'}</PrimaryButton>
-            <SecondaryButton type="button" onClick={()=>{ setTitle(''); setSlug(''); setSummary(''); setDescription(''); setLocation(''); setHeroUrl(''); setTagsCsv(''); setSortOrder(0); setIsFeatured(false) }}>Clear</SecondaryButton>
+            <input id="featured" type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} />
+            <label htmlFor="featured" className="text-sm text-neutral-700">
+              Featured
+            </label>
+          </div>
+
+          <div className="md:col-span-2 flex items-center gap-3">
+            <PrimaryButton disabled={busy} onClick={create}>
+              {busy ? 'Saving…' : 'Create Project'}
+            </PrimaryButton>
+            <SecondaryButton
+              type="button"
+              onClick={() => {
+                setTitle('')
+                setSlug('')
+                setSummary('')
+                setDescription('')
+                setLocation('')
+                setHeroUrl('')
+                setTagsCsv('')
+                setSortOrder(0)
+                setIsFeatured(false)
+              }}
+            >
+              Clear
+            </SecondaryButton>
             {err ? <div className="text-sm text-red-700">{err}</div> : null}
           </div>
         </div>
@@ -169,8 +237,8 @@ export default function AdminProjects() {
 
       <AdminCard title="All Projects" subtitle="Delete requires ADMIN role.">
         <AdminTable
-          columns={["Country", "Division", "Title", "Slug", "Featured", "Actions"]}
-          rows={projects.map((p)=> (
+          columns={['Country', 'Division', 'Title', 'Slug', 'Featured', 'Actions']}
+          rows={projects.map((p) => (
             <tr key={p.id} className="border-t border-idam-plat">
               <td className="py-3 px-2">{p.country}</td>
               <td className="py-3 px-2">{p.division?.name || '-'}</td>
@@ -179,7 +247,9 @@ export default function AdminProjects() {
               <td className="py-3 px-2">{p.isFeatured ? 'Yes' : 'No'}</td>
               <td className="py-3 px-2 flex items-center gap-3">
                 <RowActionLink href={p.country === 'INDIA' ? `/india/projects/${p.slug}` : `/srilanka/projects/${p.slug}`} label="View" />
-                <DangerButton type="button" onClick={()=>del(p.id)}>Delete</DangerButton>
+                <DangerButton type="button" onClick={() => del(p.id)}>
+                  Delete
+                </DangerButton>
               </td>
             </tr>
           ))}
