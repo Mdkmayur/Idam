@@ -145,6 +145,7 @@ model Visitor {
   id        String   @id @default(cuid())
   token     String   @unique
   createdAt DateTime @default(now())
+  views     ProjectView[]
 }
 
 model ProjectView {
