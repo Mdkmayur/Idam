@@ -1,12 +1,8 @@
-export const dynamic = "force-dynamic"
-
-import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
-export default async function IndiaHome() {
-  ...
-}
+export const dynamic = 'force-dynamic'
 
+export default async function IndiaGalleryPage() {
   const media = await prisma.projectMedia.findMany({
     where: { project: { country: 'INDIA' } },
     orderBy: [{ createdAt: 'desc' }],
@@ -21,7 +17,22 @@ export default async function IndiaHome() {
       <p className="mt-2 text-neutral-600">A curated look at latest project moments.</p>
 
       <div className="mt-8">
-        <ProjectGalleryGrid items={media} variant="full" />
+        <div className="grid md:grid-cols-3 gap-4">
+          {media.map((m) => (
+            <div
+              key={m.id}
+              className="rounded-3xl border border-idam-plat bg-white overflow-hidden shadow-soft"
+            >
+              <div className="aspect-[16/10] bg-idam-plat">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={m.url} alt={m.caption ?? 'Media'} className="w-full h-full object-cover" />
+              </div>
+              {m.caption ? (
+                <div className="p-4 text-sm text-neutral-700">{m.caption}</div>
+              ) : null}
+            </div>
+          ))}
+        </div>
       </div>
     </main>
   )
