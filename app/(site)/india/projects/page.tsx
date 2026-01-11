@@ -1,7 +1,12 @@
+export const dynamic = "force-dynamic"
+
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
-export default async function IndiaProjects() {
+export default async function IndiaHome() {
+  ...
+}
+
   const projects = await prisma.project.findMany({
     where: { country: 'INDIA' },
     include: { division: true },
