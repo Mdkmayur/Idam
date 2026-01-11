@@ -43,19 +43,22 @@ export default function AdminProjects() {
   const divisionOptions = useMemo(() => divisions.filter(d => d.country === country), [divisions, country])
 
   async function load() {
-    const [d, p] = await Promise.all([
-      fetch('/api/admin/divisions').then(r=>r.json()),
-      fetch('/api/admin/projects').then(r=>r.json())
-    ])
-    setDivisions(d)
-    setProjects(p)
-    if (!divisionId && d.length) {
-      const first = d.find((x: Division) => x.country === country)
-      if (first) setDivisionId(first.id)
-    }
+    const load = useCallback(async () => {
+  const [d, p] = await Promise.all([
+    fetch('/api/admin/divisions').then((r) => r.json()),
+    fetch('/api/admin/projects').then((r) => r.json()),
+  ])
+  setDivisions(d)
+  setProjects(p)
+  if (!divisionId && d.length) {
+    const first = d.find((x: Division) => x.country === country)
+    if (first) setDivisionId(first.id)
   }
+}, [divisionId, country])
 
-  useEffect(() => { load().catch(()=>{}) }, [])
+  useEffect(() => {
+  load().catch(() => {})
+}, [load])
 
   async function create() {
     setBusy(true)
