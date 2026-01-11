@@ -1,9 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { Label, PrimaryButton, TextArea, TextInput } from "../../../../components/FormInput"
+export const dynamic = "force-dynamic"
 
-export default function IndiaEnquire() {
+import Link from 'next/link'
+import { prisma } from '@/lib/prisma'
+
+export default async function IndiaHome() {
+  ...
+}
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
