@@ -1,7 +1,12 @@
-import ProjectGalleryGrid from '@/components/ProjectGalleryGrid'
+export const dynamic = "force-dynamic"
+
+import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
-export default async function IndiaGallery() {
+export default async function IndiaHome() {
+  ...
+}
+
   const media = await prisma.projectMedia.findMany({
     where: { project: { country: 'INDIA' } },
     orderBy: [{ createdAt: 'desc' }],
