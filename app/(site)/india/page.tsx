@@ -1,15 +1,14 @@
-export const dynamic = "force-dynamic"
-
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export default async function IndiaHome() {
-  ...
-}
   const divisions = await prisma.division.findMany({
     where: { country: 'INDIA' },
     orderBy: { sortOrder: 'asc' },
   })
+
   const featured = await prisma.project.findMany({
     where: { country: 'INDIA', isFeatured: true },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
