@@ -3,8 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import { Label, TextArea, TextInput, PrimaryButton } from '@/components/ui' // adjust if your path is different
-
 export default function IndiaEnquirePage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -50,39 +48,66 @@ export default function IndiaEnquirePage() {
       <div className="mt-8 rounded-3xl border border-idam-plat bg-white p-6 shadow-soft">
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <Label>Name</Label>
-            <TextInput value={name} onChange={(e: any) => setName(e.target.value)} placeholder="Your full name" />
+            <label className="text-sm font-medium text-idam-navy">Name</label>
+            <input
+              className="mt-2 w-full rounded-2xl border border-idam-plat px-4 py-3"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your full name"
+            />
           </div>
 
           <div>
-            <Label>Email</Label>
-            <TextInput value={email} onChange={(e: any) => setEmail(e.target.value)} placeholder="you@example.com" type="email" />
+            <label className="text-sm font-medium text-idam-navy">Email</label>
+            <input
+              className="mt-2 w-full rounded-2xl border border-idam-plat px-4 py-3"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              type="email"
+            />
           </div>
 
           <div>
-            <Label>Phone</Label>
-            <TextInput value={phone} onChange={(e: any) => setPhone(e.target.value)} placeholder="Optional" />
+            <label className="text-sm font-medium text-idam-navy">Phone</label>
+            <input
+              className="mt-2 w-full rounded-2xl border border-idam-plat px-4 py-3"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Optional"
+            />
           </div>
 
           <div>
-            <Label>Division</Label>
-            <TextInput value={division} onChange={(e: any) => setDivision(e.target.value)} placeholder="Optional" />
+            <label className="text-sm font-medium text-idam-navy">Division</label>
+            <input
+              className="mt-2 w-full rounded-2xl border border-idam-plat px-4 py-3"
+              value={division}
+              onChange={(e) => setDivision(e.target.value)}
+              placeholder="Optional"
+            />
           </div>
         </div>
 
         <div className="mt-4">
-          <Label>Message</Label>
-          <TextArea
+          <label className="text-sm font-medium text-idam-navy">Message</label>
+          <textarea
+            className="mt-2 w-full min-h-[140px] rounded-2xl border border-idam-plat px-4 py-3"
             value={message}
-            onChange={(e: any) => setMessage(e.target.value)}
+            onChange={(e) => setMessage(e.target.value)}
             placeholder="Tell us what you want to build, timeline, budget range, and any requirements."
           />
         </div>
 
         <div className="mt-5 flex items-center gap-3">
-          <PrimaryButton type="button" onClick={submit} disabled={busy}>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={busy}
+            className="rounded-2xl bg-idam-navy text-white px-5 py-3 disabled:opacity-60"
+          >
             {busy ? 'Submitting…' : 'Submit'}
-          </PrimaryButton>
+          </button>
 
           {ok ? <div className="text-sm text-green-700">Submitted. We will contact you soon.</div> : null}
           {err ? <div className="text-sm text-red-700">{err}</div> : null}
