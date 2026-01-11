@@ -13,6 +13,16 @@ export async function POST(req: Request) {
   if (!parsed.success) return new Response(JSON.stringify(parsed.error.flatten()), { status: 400 })
 
   const d = parsed.data
-  const created = await prisma.division.create({ data: { ...d } })
+  const created = await prisma.division.create({
+  data: {
+    country: d.country,
+    name: d.name,
+    slug: d.slug,
+    tagline: d.tagline ?? null,
+    description: d.description ?? null,
+    icon: d.icon ?? null,
+    sortOrder: d.sortOrder ?? 0,
+  },
+})
   return Response.json(created)
 }
