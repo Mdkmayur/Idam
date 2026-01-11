@@ -1,18 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   webpack: (config) => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
-      "@": __dirname,
+      "@": new URL(".", import.meta.url).pathname,
     };
     return config;
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
