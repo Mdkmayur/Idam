@@ -15,6 +15,14 @@ export async function POST(req: Request) {
   const parsed = ProjectMediaSchema.safeParse(await req.json())
   if (!parsed.success) return new Response(JSON.stringify(parsed.error.flatten()), { status: 400 })
   const m = parsed.data
-  const created = await prisma.projectMedia.create({ data: { ...m, caption: (m.caption || '').trim() || null } })
+  const created = await prisma.projectMedia.create({
+  data: {
+    projectId: m.projectId,
+    type: m.type,
+    url: m.url,
+    caption: (m.caption || "").trim() || null,
+    sortOrder: m.sortOrder ?? 0,
+  },
+})
   return Response.json(created)
 }
