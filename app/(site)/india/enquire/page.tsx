@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Label, PrimaryButton, TextArea, TextInput } from '@/components/FormInput'
+import { Label, PrimaryButton, TextArea, TextInput } from "../../../components/FormInput"
 
 export default function IndiaEnquire() {
   const [name, setName] = useState('')
