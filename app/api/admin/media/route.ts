@@ -12,6 +12,14 @@ export async function POST(req: Request) {
   const parsed = AlbumMediaSchema.safeParse(await req.json())
   if (!parsed.success) return new Response(JSON.stringify(parsed.error.flatten()), { status: 400 })
   const m = parsed.data
-  const created = await prisma.albumMedia.create({ data: { ...m, caption: (m.caption || '').trim() || null } })
+  const created = await prisma.albumMedia.create({
+  data: {
+    albumId: m.albumId,
+    type: m.type,
+    url: m.url,
+    caption: (m.caption || "").trim() || null,
+    sortOrder: m.sortOrder ?? 0,
+  },
+})
   return Response.json(created)
 }
