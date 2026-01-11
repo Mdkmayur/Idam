@@ -9,10 +9,13 @@ export type LightboxItem = {
   caption?: string | null
 }
 
-function dist(a: Touch, b: Touch) {
-  const dx = a.clientX - b.clientX
-  const dy = a.clientY - b.clientY
-  return Math.sqrt(dx * dx + dy * dy)
+function dist(
+  a: { clientX: number; clientY: number },
+  b: { clientX: number; clientY: number }
+) {
+  const dx = a.clientX - b.clientX;
+  const dy = a.clientY - b.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 export default function Lightbox({
